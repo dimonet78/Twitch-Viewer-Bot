@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By  # Importa By de Selenium para local
 from colorama import Fore  # Importa Fore de la biblioteca colorama para colorear la salida en la terminal
 from pystyle import Center, Colors, Colorate  # Importa módulos de pystyle para estilos de texto
 import os  # Importa el módulo os para interactuar con el sistema operativo
+import subprocess  # Importa el módulo subprocess para ejecutar comandos del sistema de manera más segura
 import time  # Importa el módulo time para manejar tiempos y pausas
 
 # Ignora las advertencias de deprecación
@@ -23,13 +24,14 @@ def verificar_actualizaciones():
             time.sleep(3)  # Pausa de 3 segundos
             return False  # Retorna False si hay una actualización disponible
         return True  # Retorna True si no hay actualizaciones
-    except:
-        return True  # Retorna True en caso de cualquier excepción
-
-# Función principal que verifica actualizaciones y muestra anuncios
-def main():
-    if not verificar_actualizaciones():  # Verifica actualizaciones
-        return  # Si hay una actualización, sale de la función
+    except requests.exceptions.RequestException as e:
+        # Maneja errores relacionados con la solicitud HTTP
+        print(f"Error al verificar actualizaciones: {e}")
+        return True
+    except IOError as e:
+        # Maneja errores relacionados con la lectura del archivo
+        print(f"Error al leer el archivo de versión local: {e}")
+        return True
 
 # Función para imprimir anuncios
 def imprimir_anuncio():
@@ -38,17 +40,18 @@ def imprimir_anuncio():
         r = requests.get("https://pastebin.com/raw/1EwXmhbY", headers={"Cache-Control": "no-cache"})
         announcement = r.content.decode('utf-8').strip()  # Decodifica y limpia el anuncio
         return announcement  # Retorna el anuncio
-    except:
-        print("Falló la verificación de la versión del bot. Inicia manualmente, pero puede que no funcione sin la última versión.\n")
+    except requests.exceptions.RequestException as e:
+        # Maneja errores relacionados con la solicitud HTTP
+        print(f"Falló la verificación de la versión del bot: {e}. Inicia manualmente, pero puede que no funcione sin la última versión.\n")
 
 # Función principal que verifica actualizaciones y muestra anuncios
 def main():
     if not verificar_actualizaciones():  # Verifica actualizaciones
         return  # Si hay una actualización, sale de la función
-    imprimir_anuncio()  # Imprime el anuncio
+    anuncio = imprimir_anuncio()  # Imprime el anuncio
 
     # Configura el título de la ventana del sistema
-    os.system(f"title fLUIDscripts. Twitch View Bot 3.1 ")
+    subprocess.run(["title", "fLUIDscripts. Twitch View Bot 3.1"], shell=True)
 
     # Imprime el banner del bot
     print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
@@ -58,11 +61,11 @@ def main():
   GITHUB: HTTPS://GITHUB.COM/FLUIDMAIN
 """)))
     print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
-    announcement = imprimir_anuncio()  # Imprime el anuncio
+    anuncio = imprimir_anuncio()  # Imprime el anuncio
     print("")
     print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
     print(Colors.red, Center.XCenter("Gracias por usar nuestro bot."))
-    print(Colors.yellow, Center.XCenter(f"{announcement}"))
+    print(Colors.yellow, Center.XCenter(f"{anuncio}"))
     print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
     print("")
 
@@ -76,13 +79,13 @@ def main():
     }
 
     # Seleccionando servidor proxy
-    print(Colors.orange, Center.XCenter("╔════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
     print(Colors.red, Center.XCenter("Si un servidor no es accesible, por favor avísame. Lo actualizaré."))
     print(Colors.red, Center.XCenter("Selecciona un servidor. Introduce el número del servidor y presiona Enter."))
     print(Colorate.Vertical(Colors.green_to_blue,"  "))
     for i in range(1, 5):
         print(Colors.cyan, Center.XCenter(f"Servidor (online) {i}"))
-    print(Colors.orange, Center.XCenter("╚════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
     proxy_choice = int(input(Colorate.Vertical(Colors.cyan_to_blue, ">>")))
     proxy_url = proxy_servers.get(proxy_choice)  # Obtiene la URL del proxy seleccionado
     
@@ -90,24 +93,24 @@ def main():
     print(Colorate.Vertical(Colors.green_to_blue,"  "))
     print(Colorate.Vertical(Colors.green_to_blue,"  "))
     print(Colorate.Vertical(Colors.green_to_blue,"  "))
-    print(Colors.orange, Center.XCenter("╔════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
     print(Colors.cyan, Center.XCenter("¿Cuenta de Twitch objetivo? ¡Proporcione solo el nombre de usuario!"))
     print(Colors.cyan, Center.XCenter("Ejemplo: fluidscripts"))
-    print(Colors.orange, Center.XCenter("╚════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
     twitch_username = input(Colorate.Vertical(Colors.cyan_to_blue, ">>"))  # Obtiene el nombre de usuario de Twitch
     
     # Selecciona cantidad de proxys
     print(Colorate.Vertical(Colors.green_to_blue,"  "))
     print(Colorate.Vertical(Colors.green_to_blue,"  "))
     print(Colorate.Vertical(Colors.green_to_blue,"  "))
-    print(Colors.orange, Center.XCenter("╔════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
     print(Colors.cyan, Center.XCenter("¿Cuántos espectadores deben ser enviados?"))
     print(Colors.cyan, Center.XCenter("(¡Números altos pueden causar errores!)"))
-    print(Colors.orange, Center.XCenter("╚════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
     proxy_count = int(input(Colorate.Vertical(Colors.cyan_to_blue, ">>")))  # Obtiene la cantidad de proxies
     
     # Siguiente paso
-    os.system("cls")  # Limpia la pantalla
+    subprocess.run("cls", shell=True)  # Limpia la pantalla
     print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
     print(Colorate.Vertical(Colors.green_to_cyan, Center.XCenter("""   ┌─┐┬  ┬ ┬┬┌┬┐┌─┐┌─┐┬─┐┬┌─┐┌┬┐┌─┐ 
    ├┤ │  │ ││ ││└─┐│  ├┬┘│├─┘ │ └─┐ 
@@ -117,11 +120,11 @@ def main():
     print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
     print('')
     print('')
-    print(Colors.orange, Center.XCenter("╔════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
     print(Colors.cyan, Center.XCenter("El bot empieza y envía espectadores."))
     print(Colors.cyan, Center.XCenter("Si no llegan todos los espectadores o no funciona,"))
     print(Colors.cyan, Center.XCenter("reinicia el bot o cambia el servidor proxy."))
-    print(Colors.orange, Center.XCenter("╚════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
 
     # Configura el navegador Chrome
     chrome_path = r'C:\Program Files\Google\Chrome\Application\chrome.exe'  # Ubicación del navegador Chrome
@@ -152,7 +155,7 @@ def main():
         text_box.send_keys(Keys.RETURN)
 
     # Fin
-    os.system("cls")  # Limpia la pantalla
+    subprocess.run("cls", shell=True)  # Limpia la pantalla
     print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
     print(Colorate.Vertical(Colors.green_to_cyan, Center.XCenter("""   ┌─┐┬  ┬ ┬┬┌┬┐┌─┐┌─┐┬─┐┬┌─┐┌┬┐┌─┐ 
    ├┤ │  │ ││ ││└─┐│  ├┬┘│├─┘ │ └─┐ 
@@ -160,7 +163,7 @@ def main():
   GITHUB: HTTPS://GITHUB.COM/FLUIDMAIN
 """)))
     print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
-    print(Colors.orange, Center.XCenter("╔════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╮"))
     print(Colors.cyan, Center.XCenter("Los espectadores han llegado."))
     print(Colors.cyan, Center.XCenter(""))
     print(Colors.cyan, Center.XCenter("Si el conteo de espectadores disminuye o el bot deja de funcionar,"))
@@ -168,10 +171,9 @@ def main():
     print(Colors.cyan, Center.XCenter(""))
     print(Colors.cyan, Center.XCenter("Mantén la ventana abierta mientras desees usar el bot."))
     print(Colors.cyan, Center.XCenter("Cuando quieras salir del bot, presiona la tecla ENTER o cierra la ventana."))
-    print(Colors.orange, Center.XCenter("╚════════════════════════════════════════════════════[...]"))
+    print(Colors.orange, Center.XCenter("╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅╯"))
     input(Colorate.Vertical(Colors.cyan_to_blue, ">>"))  # Espera a que el usuario presione ENTER para salir
     driver.quit()  # Cierra el navegador
-
 
 if __name__ == '__main__':
     main()  # Ejecuta la función principal
